@@ -43,21 +43,36 @@ app.use(express.json());
 // app.set("view engine", "handlebars");
 
 // Import routes and give the server access to them.
-// var routes = require("./controllers/customerOrdersController.js");
+const routes = require('./routes');
+const db = require("./models");
 
-// app.use(routes);
 
-// Start our server so that it can begin listening to client requests.
-app.listen(PORT, function () {
-  // Log (server-side) when our server has started
-  console.log("Server listening on: http://localhost:" + PORT);
+app.use(routes);
+
+db.sequelize.sync().then(function() {
+  app.listen(PORT, function() {
+    console.log("Server listening on: http://localhost:" + PORT);
+  });
 });
+// Start our server so that it can begin listening to client requests.
 
 
-let connection = require('./config/connection')
+// // let connection = require('./config/connection')
+
+// //gets new orders
 // let orders = require("./MWS/ordersForInterval");
-// let orderItems = require("./MWS/orderItems");
-// let pendingOrderUpdater = require("./MWS/pendingOrderUpdater");
-// let inventory = require("./MWS/inventory");
-let listCurrentSkus = require("./MWS/listCurrentSkus");
 
+// //gets the items from the orders
+// let orderItems = require("./MWS/orderItems");
+
+// //checks pending items and updates them to 'shipped'
+// let pendingOrderUpdater = require("./MWS/pendingOrderUpdater");
+
+// //updates current inventory
+// let inventory = require("./MWS/inventory");
+
+// //function that outputs sales for a given sku
+// let listCurrentSkus = require("./MWS/listCurrentSkus");
+
+//returns the necessary Sales Velocity needed to avoid expiration of products 
+let overstock = require("./MWS/overstock");

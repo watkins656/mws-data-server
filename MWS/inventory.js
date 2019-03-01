@@ -10,7 +10,7 @@ let mysql = require("mysql");
 let moment = require('moment');
 let _ = require('underscore')
 let connection = require('../config/connection');
-let SKUsArray=[];
+let SKUsArray=[1];
 let inventory = inventoryBuild();
 
 function inventoryBuild() {
@@ -46,14 +46,14 @@ function inventoryBuild() {
                 SellerSKU: item.SellerSKU
             },
             (err, res) => {
-                console.log(err);
-                console.log(res.affectedRows + " order inserted!\n");
+                console.log("inventory: " + err);
+                console.log("inventory: " + res.affectedRows + " order inserted!\n");
                 // Call updateProduct AFTER the INSERT completes
             }
         )
     };
     function fulfillmentInventoryRequest(nextToken) {
-        nextToken?console.log('running with nextToken: ' + nextToken):console.log('Initial Request');
+        nextToken?console.log("inventory: " + 'running with nextToken: ' + nextToken):console.log("inventory: " + 'Initial Request');
         amazonMws.fulfillmentInventory.search((nextToken) ? {
             'Version': '2010-10-01',
             'Action': 'ListInventorySupplyByNextToken',
@@ -71,18 +71,18 @@ function inventoryBuild() {
                 'QueryStartDateTime': new Date(2016, 9, 24)
             }, (error, response) => {
                 if (error) {
-                    console.log('fulfillmentInventory error Code: ', error.Code);
+                    console.log("inventory: " + 'fulfillmentInventory error Code: ', error.Code);
                     if (error.Code == 'RequestThrottled') {
-                        console.log('restarting due to request throttled');
+                        console.log("inventory: " + 'restarting due to request throttled');
                         setTimeout(
                             function () { fulfillmentInventoryRequest(nextToken) }, 1000);
                     }
                     return;
                 }
-                console.log('response recieved');
+                console.log("inventory: " + 'response recieved');
                 let inventory = response.InventorySupplyList.member; // TODO: This is an array of my Amazon FBA Inventory supply.  Insert this into mySQL database 
                 insertInventory(inventory);
-                if (response.NextToken) { console.log('Next Token: ' + response.NextToken); }
+                if (response.NextToken) { console.log("inventory: " + 'Next Token: ' + response.NextToken); }
                 if (response.NextToken) {
                     NextToken = (response.NextToken);
                     setTimeout(
@@ -106,7 +106,7 @@ function inventoryBuild() {
             t2.id > t1.id AND t1.sellerSKU = t2.sellerSKU;
             
         `, (err, results) => {
-                console.log('finished removing duplicates'); return;
+                console.log("inventory: " + 'finished removing duplicates'); return;
             });
     };
     function inquire() {
@@ -120,7 +120,8 @@ function inventoryBuild() {
                     {
                         type: "list",
                         message: "Which SKU would you like?",
-                        choices: this.SKUsArray,
+                        choices: this.SKUsArray||['none']
+                        ,
                         name: "SKU"
                     },
                     {
@@ -136,10 +137,10 @@ function inventoryBuild() {
                             this.salesByDay(res.SKU)
                             break;
                         case "BY WEEK":
-                            console.log("By Week"); //TODO:
+                            console.log("inventory: " + "By Week"); //TODO:
                             break;
                         case "BY MONTH":
-                            console.log("By Month");    //TODO:
+                            console.log("inventory: " + "By Month");    //TODO:
                             break;
 
                         default:
@@ -166,7 +167,7 @@ function inventoryBuild() {
                     }
                 });
                 var counts = _.countBy(dateArr);
-                console.log(counts);
+                console.log("inventory: " + counts);
                 return (counts);
             })
     };
@@ -190,6 +191,6 @@ let query = connection.query(
 )
 // inventory.main()
 // inventory.fulfillmentInventoryRequest();
-inventory.inquire();
+// inventory.inquire();
 
 module.exports = inventory;

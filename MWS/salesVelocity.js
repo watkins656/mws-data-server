@@ -19,7 +19,7 @@ connection.connect(function (err) {
 
 });
 let salesVelocity = {
-    SKUsArray: [],
+    SKUsArray: [1,2],
     main: function () {
         var query = connection.query(`SELECT SellerSKU from order_items GROUP BY SellerSKU ORDER BY SellerSKU`, (err, results) => {
             console.log('Here');

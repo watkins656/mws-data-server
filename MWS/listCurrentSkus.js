@@ -10,7 +10,7 @@ let mysql = require("mysql");
 let moment = require('moment');
 let _ = require('underscore')
 let connection = require('../config/connection');
-let SKUsArray = [];
+let SKUsArray = ['1','2'];
 
 
 
@@ -77,13 +77,14 @@ function getAllSellerSKUs() {
 
 
 let query = connection.query(
-    `SELECT SellerSKU FROM order_items WHERE createdAt > '2019-02-17 05:19:29' GROUP BY SellerSKU`,
+    `SELECT SellerSKU FROM order_items WHERE createdAt > '2019-01-17 05:19:29' GROUP BY SellerSKU`,
     (err, res) => {
         res.forEach(SellerSKU => {
             SKUsArray.push(SellerSKU.SellerSKU);
         });
         console.log(SKUsArray);
-        inquire()
+        // inquire()
+        salesByDay('Slim Jim Bacon Jerky 8-pack')
 
     }
 )

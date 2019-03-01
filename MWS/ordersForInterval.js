@@ -37,14 +37,14 @@ function orders() {
 
 
     function getLastRunDate() {
-        console.log("Running getLastRunDate");
+        console.log("ordersForInterval: " + "Checking for Orders");
         let query = connection.query(
             "SELECT MAX(PurchaseDate)as date FROM orders",
             function (err, res) {
                 if (res) {
                     date = new Date(res[0].date);
                     updateAfter = moment(date.setDate(date.getDate() - 2)).toISOString();
-                    console.log(updateAfter);
+                    console.log("ordersForInterval: " + "update after: " + updateAfter);
                 } else {
                     date = new Date();
                 }
@@ -55,7 +55,7 @@ function orders() {
     };
 
     function request(NextToken) {
-        console.log("Running request");
+        console.log("ordersForInterval: " + "Checking for new Orders");
         amazonMws.orders.search((NextToken) ? {
             'Version': '2013-09-01',
             'Action': action,
@@ -75,9 +75,9 @@ function orders() {
                 'LastUpdatedBefore': updateBefore,
             }, (error, response) => {
                 if (error) {
-                    console.log('request error Code: ', error.Code);
+                    console.log("ordersForInterval: " + 'request error Code: ', error.Code);
                     if (error.Code == 'RequestThrottled') {
-                        console.log('restarting due to request throttled');
+                        console.log("ordersForInterval: " + 'restarting due to request throttled');
                         setTimeout(
                             function () { request(NextToken) }, 180000);
                         }
@@ -85,16 +85,16 @@ function orders() {
                     }
                 let orders = response.Orders.Order;
                 insertOrders(orders);
-                if (response.NextToken) { console.log('Next Token: ' + response.NextToken); }
+                if (response.NextToken) { console.log("ordersForInterval: " + 'Next Token: ' + response.NextToken); }
                 if (response.NextToken) {
                     NextToken = (response.NextToken);
-                    console.log(NextToken);
+                    console.log("ordersForInterval: " + NextToken);
                     action = 'ListOrdersByNextToken'
                     setTimeout(
-                        function () {console.log('timeout'); request(NextToken) }, 1000);
+                        function () {console.log("ordersForInterval: " + 'timeout'); request(NextToken) }, 1000);
                 }
                 else {
-                    console.log("No More Orders! Checking again in 5 minutes");
+                    console.log("ordersForInterval: " + "No More Orders! Checking again in 5 minutes");
                     setTimeout(
                         function () { request() }, 300000);  
                 }
@@ -109,7 +109,7 @@ function orders() {
                     if (response.length == 0) {
                         insertOrder(order);
                     }
-                    else console.log("order already in database");
+                    else console.log("ordersForInterval: " + "order already in database");
                 });
         });
     };
@@ -146,8 +146,8 @@ function orders() {
                 ShippingAddress: order.ShippingAddress
             },
             function (err, res) {
-                console.log(err);
-                console.log(res.affectedRows + " order inserted!\n");
+                console.log("ordersForInterval: " + err);
+                console.log("ordersForInterval: " + res.affectedRows + " order inserted!\n");
                 // Call updateProduct AFTER the INSERT completes
             }
         )
@@ -194,10 +194,10 @@ function orders() {
 //         let query = connection.query(
 //             "SELECT MAX(PurchaseDate)as date FROM orders",
 //             function (err, res) {
-//                 console.log(JSON.stringify(res) + " is your date!\n");
+//                 console.log("ordersForInterval: " + JSON.stringify(res) + " is your date!\n");
 //                 date = new Date(res[0].date)
 //                 this.updateAfter = date.setDate(date.getDate() - 3)
-//                 console.log(this.updateAfter);
+//                 console.log("ordersForInterval: " + this.updateAfter);
 //                 // Call updateProduct AFTER the INSERT completes
 //             }
 //         )
@@ -215,12 +215,12 @@ function orders() {
 //             'LastUpdatedBefore': this.updateBefore,
 //         }, (error, response) => {
 //             if (error) {
-//                 console.log('request error ', error);
+//                 console.log("ordersForInterval: " + 'request error ', error);
 //                 return;
 //             }
 //             let orders = response.Orders.Order;
 //             this.insertOrders(orders);
-//             console.log('Next Token: ' + response.NextToken);
+//             console.log("ordersForInterval: " + 'Next Token: ' + response.NextToken);
 //             if (response.NextToken) {
 //                 this.NextToken = (response.NextToken);
 //                 this.action = 'ListOrdersByNextToken'
@@ -275,7 +275,7 @@ function orders() {
 //                 ShippingAddress: order.ShippingAddress
 //             },
 //             function (err, res) {
-//                 console.log(res.affectedRows + " order inserted!\n");
+//                 console.log("ordersForInterval: " + res.affectedRows + " order inserted!\n");
 //                 // Call updateProduct AFTER the INSERT completes
 //             }
 //         )
@@ -326,7 +326,7 @@ function orders() {
 //     function getLastRunDate() {
 //     };
 //     function request() {
-//         console.log("running request");
+//         console.log("ordersForInterval: " + "running request");
 //         getLastRunDate()
 //     };
 // } 

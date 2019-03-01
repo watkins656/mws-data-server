@@ -37,7 +37,7 @@ function orders() {
 
 
     function getLastRunDate() {
-        console.log("Running getLastRunDate");
+        console.log("pendingOrderUpdater: " + "Checking for more Orders");
         let query = connection.query(
             "SELECT MAX(PurchaseDate)as date FROM orders",
             function (err, res) {
@@ -55,8 +55,8 @@ function orders() {
     };
 
     function request(NextToken) {
-        if (NextToken) { console.log("Running request with NEXT TOKEN"); }
-        else { console.log("Running request"); }
+        if (NextToken) { console.log("pendingOrderUpdater: " + "Updating Pending Orders with NEXT TOKEN"); }
+        else { console.log("pendingOrderUpdater: " + "Updating Pending Orders"); }
 
         // WITH NEXT TOKEN
         amazonMws.orders.search((NextToken) ? {
@@ -80,9 +80,9 @@ function orders() {
                 'LastUpdatedBefore': updateBefore,
             }, (error, response) => {
                 if (error) {
-                    console.log('request error Code: ', error.Code);
+                    console.log("pendingOrderUpdater: " + 'request error Code: ', error.Code);
                     if (error.Code == 'RequestThrottled') {
-                        console.log('restarting due to request throttled');
+                        console.log("pendingOrderUpdater: " + 'restarting due to request throttled');
                         setTimeout(
                             function () { request(NextToken) }, 180000);
                     }
@@ -90,7 +90,7 @@ function orders() {
                 }
                 let orders = response.Orders.Order;
                 insertOrders(orders);
-                if (response.NextToken) { console.log('Next Token: ' + response.NextToken); }
+                if (response.NextToken) { console.log("pendingOrderUpdater: " + 'Next Token: ' + response.NextToken); }
                 if (response.NextToken) {
                     NextToken = (response.NextToken);
                     action = 'ListOrdersByNextToken'
@@ -109,7 +109,7 @@ function orders() {
         orders.forEach(order => {
             let q = connection.query("SELECT * FROM orders WHERE ?", { AmazonOrderId: order.AmazonOrderId },
                 (err, response) => {
-                    console.log(response[0].OrderStatus);
+                    console.log("pendingOrderUpdater: " + response[0].OrderStatus);
                     if (response.length == 0) {
                         insertOrder(order);
                     }
@@ -152,14 +152,14 @@ function orders() {
                 ShippingAddress: order.ShippingAddress
             },
             function (err, res) {
-                console.log(err);
-                console.log(res.affectedRows + " order inserted!\n");
+                console.log("pendingOrderUpdater: " + err);
+                console.log("pendingOrderUpdater: " + res.affectedRows + " order inserted!\n");
                 // Call updateProduct AFTER the INSERT completes
             }
         )
     };
     function updateOrder(order) {
-        console.log("Updating a pending order");
+        console.log("pendingOrderUpdater: " + "Updating a pending order");
         let query = connection.query(
             `UPDATE orders SET ? WHERE ?;`,
             [{
@@ -190,8 +190,8 @@ function orders() {
                 ShippingAddress: order.ShippingAddress
             }, { AmazonOrderId: order.AmazonOrderId }],
             function (err, res) {
-                console.log(err);
-                console.log(JSON.stringify(res, null, 2) + " order inserted!\n");
+                console.log("pendingOrderUpdater: " + err);
+                console.log("pendingOrderUpdater: " + JSON.stringify(res, null, 2) + " order inserted!\n");
                 // Call updateProduct AFTER the INSERT completes
             }
         )
@@ -238,10 +238,10 @@ function orders() {
 //         let query = connection.query(
 //             "SELECT MAX(PurchaseDate)as date FROM orders",
 //             function (err, res) {
-//                 console.log(JSON.stringify(res) + " is your date!\n");
+//                 console.log("pendingOrderUpdater: " + JSON.stringify(res) + " is your date!\n");
 //                 date = new Date(res[0].date)
 //                 this.updateAfter = date.setDate(date.getDate() - 3)
-//                 console.log(this.updateAfter);
+//                 console.log("pendingOrderUpdater: " + this.updateAfter);
 //                 // Call updateProduct AFTER the INSERT completes
 //             }
 //         )
@@ -259,12 +259,12 @@ function orders() {
 //             'LastUpdatedBefore': this.updateBefore,
 //         }, (error, response) => {
 //             if (error) {
-//                 console.log('request error ', error);
+//                 console.log("pendingOrderUpdater: " + 'request error ', error);
 //                 return;
 //             }
 //             let orders = response.Orders.Order;
 //             this.insertOrders(orders);
-//             console.log('Next Token: ' + response.NextToken);
+//             console.log("pendingOrderUpdater: " + 'Next Token: ' + response.NextToken);
 //             if (response.NextToken) {
 //                 this.NextToken = (response.NextToken);
 //                 this.action = 'ListOrdersByNextToken'
@@ -319,7 +319,7 @@ function orders() {
 //                 ShippingAddress: order.ShippingAddress
 //             },
 //             function (err, res) {
-//                 console.log(res.affectedRows + " order inserted!\n");
+//                 console.log("pendingOrderUpdater: " + res.affectedRows + " order inserted!\n");
 //                 // Call updateProduct AFTER the INSERT completes
 //             }
 //         )
@@ -356,7 +356,7 @@ function orders() {
 //     }
 // }
 // orders.request();
-setInterval(ordersObject.getLastRunDate, 10000);
+setInterval(ordersObject.getLastRunDate, 180000);
 // ordersObject.getLastRunDate();
 
 
@@ -370,7 +370,7 @@ setInterval(ordersObject.getLastRunDate, 10000);
 //     function getLastRunDate() {
 //     };
 //     function request() {
-//         console.log("running request");
+//         console.log("pendingOrderUpdater: " + "running request");
 //         getLastRunDate()
 //     };
 // } 

@@ -1,9 +1,17 @@
 {
   "development": {
-    "username": "j8kkcxn1jgink6sr",
-    "password": "qev8k6qyortaal60",
-    "database": "g19kgxd0tyqbpecb",
-    "host": "jsftj8ez0cevjz8v.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+    "username": {
+      "use_env_variable": "DB_USER"
+    },
+    "password": {
+      "use_env_variable": "DB_PASS"
+    },
+    "database": {
+      "use_env_variable": "DB_NAME"
+    },
+    "host": {
+      "use_env_variable": "DB_HOST"
+    },
     "dialect": "mysql"
   },
   "test": {

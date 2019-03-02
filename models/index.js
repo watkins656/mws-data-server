@@ -8,11 +8,19 @@ var env = process.env.NODE_ENV || "development";
 var config = require(__dirname + "/../config/config.json")[env];
 var db = {};
 
-if (config.use_env_variable) {
-  var sequelize = new Sequelize(process.env[config.use_env_variable]);
-} else {
-  var sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
+  // var sequelize = new Sequelize(process.env.JAWSDB_URL||
+  //   process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS);
+  var sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS,  {
+    host: process.env.HOST,
+    port: 3306,
+    dialect: "mysql",
+    pool: {
+      max: 5,
+      min: 0,
+      idle: 10000
+    }
+  });
+
 
 fs
   .readdirSync(__dirname)

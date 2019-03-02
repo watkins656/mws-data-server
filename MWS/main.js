@@ -7,20 +7,32 @@ var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
 let amazonMws = require('amazon-mws')(accessKey, accessSecret);
 let inquirer = require('inquirer');
 let mysql = require("mysql");
-let connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: mySQLPassword,
-    database: "amazon"
-});
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("\nSuccessfully Connected to the database! Connection ID:" + connection.threadId + "\n");
-    userAuth();
-});
+let connection = require('../config/connection');
 
-let MWS = {
+
+let MWS = function(){
+    // //gets new orders
+// let orders = require("./ordersForInterval");
+
+// //gets the items from the orders
+// let orderItems = require("./orderItems");
+
+// //checks pending items and updates them to 'shipped'
+// let pendingOrderUpdater = require("./pendingOrderUpdater");
+
+// //updates current inventory
+// let inventory = require("./inventory");
+
+// //function that outputs sales for a given sku
+// let listCurrentSkus = require("./listCurrentSkus");
+
+// //function that outputs sales by Day/Week/Month for a given sku
+let salesVelocity = require("./salesVelocity");
+
+//returns the necessary Sales Velocity needed to avoid expiration of products 
+// let overstock = require("./overstock");
+}
+let MWSObject = {
     MWS: function MWS() {
         inquirer
         .prompt([
@@ -147,6 +159,6 @@ function userAuth() {
         this.password = pass;
     }
 }
-require('./ordersForInterval.js');
+// require('./ordersForInterval.js');
 
-module.exports = MWS;
+MWS();

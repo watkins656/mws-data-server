@@ -54,10 +54,9 @@ db.sequelize.sync().then(function() {
     console.log("Server listening on: http://localhost:" + PORT);
   });
 });
-// Start our server so that it can begin listening to client requests.
 
-
-// // let connection = require('./config/connection')
+//runs all the data services
+require('./MWS/main') 
 
 // //gets new orders
 // let orders = require("./MWS/ordersForInterval");
@@ -74,5 +73,8 @@ db.sequelize.sync().then(function() {
 // //function that outputs sales for a given sku
 // let listCurrentSkus = require("./MWS/listCurrentSkus");
 
+// //function that outputs sales by Day/Week/Month for a given sku
+// let salesVelocity = require("./MWS/salesVelocity");
+
 //returns the necessary Sales Velocity needed to avoid expiration of products 
-let overstock = require("./MWS/overstock");
+// let overstock = require("./MWS/overstock");

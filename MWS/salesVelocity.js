@@ -6,18 +6,8 @@ let inquirer = require("inquirer");
 let mysql = require("mysql");
 let moment = require('moment');
 let _ = require('underscore')
-let connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: process.env.MYSQL_PASSWORD,
-    database: "amazon"
-});
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
+let connection = require('../config/connection');
 
-});
 let salesVelocity = {
     SKUsArray: [1,2],
     main: function () {
@@ -69,6 +59,7 @@ let salesVelocity = {
 
     },
     salesByDay: function (msku) {
+        console.log('here');
         var query = connection.query(`SELECT
         o.AmazonOrderId,
     o.PurchaseDate,
@@ -94,6 +85,5 @@ let salesVelocity = {
 
     }
 }
-salesVelocity.main();
+salesVelocity.salesByDay('Slim Jim Bacon Jerky 8-pack');
 
-module.exports = salesVelocity;

@@ -12,13 +12,13 @@ let connection = require('../config/connection');
 
 let MWS = function(){
     // //gets new orders
-// let orders = require("./ordersForInterval");
+let orders = require("./ordersForInterval");
 
 // //gets the items from the orders
-// let orderItems = require("./orderItems");
+let orderItems = require("./orderItems");
 
 // //checks pending items and updates them to 'shipped'
-// let pendingOrderUpdater = require("./pendingOrderUpdater");
+let pendingOrderUpdater = require("./pendingOrderUpdater");
 
 // //updates current inventory
 // let inventory = require("./inventory");
@@ -27,7 +27,7 @@ let MWS = function(){
 // let listCurrentSkus = require("./listCurrentSkus");
 
 // //function that outputs sales by Day/Week/Month for a given sku
-let salesVelocity = require("./salesVelocity");
+// let salesVelocity = require("./salesVelocity");
 
 //returns the necessary Sales Velocity needed to avoid expiration of products 
 // let overstock = require("./overstock");

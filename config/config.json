@@ -1,5 +1,6 @@
 {
   "development": {
+<<<<<<< HEAD
     "username": {
       "use_env_variable": "DB_USER"
     },
@@ -12,6 +13,9 @@
     "host": {
       "use_env_variable": "DB_HOST"
     },
+=======
+      "use_env_variable": "JAWSDB_URL",
+>>>>>>> 1261e2e5730d232370622e35200afe8e3384fe25
     "dialect": "mysql"
   },
   "test": {

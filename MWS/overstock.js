@@ -1,6 +1,6 @@
 let dotenv = require("dotenv").config({ path: __dirname + '/../.env' });
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
 let amazonMws = require('amazon-mws')(accessKey, accessSecret);
 let SellerId = process.env.MWS_SELLER_ID;
 let mySQLPassword = process.env.MYSQL_PASSWORD;
@@ -50,7 +50,7 @@ function inquire() {
         });
 };
 function salesByDay(msku) {
-    var query = connection.query(`SELECT
+    const query = connection.query(`SELECT
         o.AmazonOrderId,
     o.PurchaseDate,
     i.SellerSKU,
@@ -66,7 +66,7 @@ function salesByDay(msku) {
                     dateArr.push(moment(element.PurchaseDate).format("MM-DD-YYYY"));
                 }
             });
-            var counts = _.countBy(dateArr);
+            const counts = _.countBy(dateArr);
             console.log("overstock: " + counts);
             return (counts);
         })

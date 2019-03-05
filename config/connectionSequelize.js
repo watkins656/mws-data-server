@@ -1,9 +1,9 @@
 let dotenv = require('dotenv').config({ path: __dirname + '/../.env' })
 
-var Sequelize = require("sequelize");
+const Sequelize = require("sequelize");
 
 // Creates mySQL connection using Sequelize, the empty string in the third argument spot is our password.
-var sequelize = new Sequelize(process.env.JAWSDB_URL);
+const sequelize = new Sequelize(process.env.JAWSDB_URL);
 process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
   host: process.env.HOST,
   port: 3306,

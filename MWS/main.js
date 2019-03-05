@@ -1,68 +1,71 @@
 'use strict';
 // Read and set environment variables
-let dotenv = require("dotenv").config();
-let mySQLPassword = process.env.MYSQL_PASSWORD;
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
-let amazonMws = require('amazon-mws')(accessKey, accessSecret);
-let inquirer = require('inquirer');
-let mysql = require("mysql");
-let connection = require('../config/connection');
+const dotenv = require("dotenv").config();
+const mySQLPassword = process.env.MYSQL_PASSWORD;
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const amazonMws = require('amazon-mws')(accessKey, accessSecret);
+const inquirer = require('inquirer');
+const mysql = require("mysql");
+const connection = require('../config/connection');
 
 
-let MWS = function(){
+const MWS = function () {
     // //gets new orders
-let orders = require("./ordersForInterval");
+    const orders = require("./ordersForInterval");
 
-// //gets the items from the orders
-let orderItems = require("./orderItems");
+    // //gets the items from the orders
+    const orderItems = require("./orderItems");
 
-// //checks pending items and updates them to 'shipped'
-let pendingOrderUpdater = require("./pendingOrderUpdater");
+    // //checks pending items and updates them to 'shipped'
+    const pendingOrderUpdater = require("./pendingOrderUpdater");
 
-// //updates current inventory
-// let inventory = require("./inventory");
+    // //updates current inventory
+    const inventory = require("./inventory");
 
-// //function that outputs sales for a given sku
-// let listCurrentSkus = require("./listCurrentSkus");
+    // //function that outputs sales for a given sku
+    const listCurrentSkus = require("./listCurrentSkus");
 
-// //function that outputs sales by Day/Week/Month for a given sku
-// let salesVelocity = require("./salesVelocity");
+    // //function that outputs sales by Day/Week/Month for a given sku
+    const salesVelocity = require("./salesVelocity");
 
-//returns the necessary Sales Velocity needed to avoid expiration of products 
-// let overstock = require("./overstock");
+    // //function that updates various reports
+    const reports = require("./reports");
+
+    //returns the necessary Sales Velocity needed to avoid expiration of products 
+    const overstock = require("./overstock");
 }
-let MWSObject = {
+const MWSObject = {
     MWS: function MWS() {
         inquirer
-        .prompt([
-            // Here we create a basic text prompt.
-            {
-                type: "list",
-                message: "Where to?",
-                choices: ["ORDERS", "PRODUCT RESEARCH", "OVERSTOCK"],
-                name: "action"
-            },
-        ])
-        .then(function (res) {
-            switch (res.action) {
-                case "ORDERS":
-                    require('./orders.js');
-                    break;
+            .prompt([
+                // Here we create a basic text prompt.
+                {
+                    type: "list",
+                    message: "Where to?",
+                    choices: ["ORDERS", "PRODUCT RESEARCH", "OVERSTOCK"],
+                    name: "action"
+                },
+            ])
+            .then(function (res) {
+                switch (res.action) {
+                    case "ORDERS":
+                        require('./orders.js');
+                        break;
 
-                case "PRODUCT RESEARCH":
-                    require('./productResearch.js');
-                    break;
-                case "OVERSTOCK":
-                    require('./overstock.js');
-                    break;
+                    case "PRODUCT RESEARCH":
+                        require('./productResearch.js');
+                        break;
+                    case "OVERSTOCK":
+                        require('./overstock.js');
+                        break;
 
-                default:
-                    break;
-            }
-        });
+                    default:
+                        break;
+                }
+            });
 
-}
+    }
 };
 function userAuth() {
     inquirer
@@ -71,7 +74,7 @@ function userAuth() {
             {
                 type: "list",
                 message: "New or Existing User?",
-                choices: [ "EXISTING USER","NEW USER"],
+                choices: ["EXISTING USER", "NEW USER"],
                 name: "newUser"
             },
         ])
@@ -98,20 +101,23 @@ function userAuth() {
                 }
             ])
             .then(function (response) {
-                let user = new User(response.username, response.password);
-                let query = connection.query("SELECT username FROM users WHERE ?", { username: user.username }, (err, res) => {
-                    if (res.length == 0) {
-                        addUser(user);
+                const user = new User(response.username, response.password);
+                const queryString = "SELECT username FROM users WHERE ?";
+                const queryParams = { username: user.username };
+                connection.query(queryString, queryParams,
+                    (err, res) => {
+                        if (res.length == 0) {
+                            addUser(user);
 
+                        }
+                        else {
+                            console.log("\nUsername already exists!\n");
+                            newUser();
+                        }
                     }
-                    else {
-                        console.log("\nUsername already exists!\n");
-                        newUser();
-                    }
-                }
                 )
                 function addUser(user) {
-                    let query = connection.query(
+                    const query = connection.query(
                         "INSERT INTO users SET ?",
                         user,
                         function (err, res) {
@@ -140,16 +146,19 @@ function userAuth() {
                 }
             ])
             .then(function (response) {
-                let user = new User(response.username, response.password);
-                let query = connection.query("SELECT * FROM users WHERE ?", { username: user.username }, (err, res) => {
-                    if (user.password === res[0].password) {
-                        console.log('Log-in Successful!');
-                        MWS.MWS();
+                const user = new User(response.username, response.password);
+                const queryString = "SELECT * FROM users WHERE ?";
+                const queryParams = { username: user.username };
+                connection.query(queryString, queryParams,
+                    (err, res) => {
+                        if (user.password === res[0].password) {
+                            console.log('Log-in Successful!');
+                            MWS.MWS();
+                        }
+                        else {
+                            console.log("\nForget your password?\n");
+                        }
                     }
-                    else {
-                        console.log("\nForget your password?\n");
-                    }
-                }
                 )
 
             })

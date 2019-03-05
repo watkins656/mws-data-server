@@ -1,6 +1,6 @@
 let dotenv = require("dotenv").config();
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
 let amazonMws = require('amazon-mws')(accessKey, accessSecret);
 let mySQLPassword = process.env.MYSQL_PASSWORD;
 let SellerID = process.env.MWS_SELLER_ID;
@@ -78,7 +78,10 @@ let orders = {
 
     insertOrders: function (orders) {
         orders.forEach(order => {
-            let q = connection.query("SELECT AmazonOrderId FROM orders WHERE ?", { AmazonOrderId: order.AmazonOrderId },
+
+            let queryString = "SELECT AmazonOrderId FROM orders WHERE ?";
+            const queryParams = { AmazonOrderId: order.AmazonOrderId };
+            connection.query(queryString, queryParams,
                 (err, response) => {
                     if (response.length == 0) {
                         this.insertOrder(order);
@@ -137,7 +140,7 @@ let orders = {
             .then((res) => {
                 switch (res.action) {
                     case "UPDATE DATABASE WITH LATEST ORDERS (Recommended)":
-                    this.getLastRunDate();
+                        this.getLastRunDate();
                         this.request();
                         break;
                     case "GET SALES VELOCITY FOR SKU":

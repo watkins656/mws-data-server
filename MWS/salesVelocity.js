@@ -1,12 +1,15 @@
-let moment = require('moment');
-let _ = require('underscore')
-let connection = require('../config/connection');
+const moment = require('moment');
+const _ = require('underscore')
+const connection = require('../config/connection');
 
-let salesVelocity = {
+
+
+const salesVelocity = {
     SKUsArray: [1, 2],
     main: function () {
-        var query = connection.query(`SELECT SellerSKU from order_items GROUP BY SellerSKU ORDER BY SellerSKU`, (err, results) => {
-            let arr = [];
+        const queryString = `SELECT SellerSKU from order_items GROUP BY SellerSKU ORDER BY SellerSKU`
+        const query = connection.query(queryString, (err, results) => {
+            const arr = [];
             results.forEach(element => {
                 if (element.SellerSKU)
                     this.SKUsArray.push(element.SellerSKU);
@@ -15,23 +18,26 @@ let salesVelocity = {
         })
     },
     salesByDay: function (msku) {
-        var query = connection.query(`SELECT
+        const queryString = `SELECT
         o.AmazonOrderId,
-    o.PurchaseDate,
-    i.SellerSKU,
-    i.QuantityOrdered
-    FROM
-    orders o
-    LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
-    WHERE ?`, { SellerSKU: msku }, (err, results) => {
-                let dateArr = [];
+        o.PurchaseDate,
+        i.SellerSKU,
+        i.QuantityOrdered
+        FROM
+        orders o
+        LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
+        WHERE ?`
+        const SKU = { SellerSKU: msku }
+        connection.query(queryString, SKU,
+            (err, results) => {
+                const dateArr = [];
                 results.forEach(element => {
-                    let orderQty = element.QuantityOrdered;
+                    const orderQty = element.QuantityOrdered;
                     for (i = 0; i < orderQty; i++) {
                         dateArr.push(moment(element.PurchaseDate).format("MM-DD-YYYY"));
                     }
                 });
-                var counts = _.countBy(dateArr);
+                const counts = _.countBy(dateArr);
                 console.log(counts);
                 return (counts);
             })
@@ -39,28 +45,33 @@ let salesVelocity = {
 
     // gets sales for last 'X' days
     salesForLastXDays: function (msku, days) {
-        var query = connection.query(`SELECT
+
+        const queryString = `SELECT
         o.AmazonOrderId,
-    o.PurchaseDate,
-    i.SellerSKU,
-    i.QuantityOrdered
-    FROM
-    orders o
-    LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
-    WHERE ?`, { SellerSKU: msku }, (err, results) => {
-                let dateArr = [];
+        o.PurchaseDate,
+        i.SellerSKU,
+        i.QuantityOrdered
+        FROM
+        orders o
+        LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
+        WHERE ?`
+        const SKU = { SellerSKU: msku }
+        connection.query(queryString, SKU,
+            (err, results) => {
+                const dateArr = [];
                 results.forEach(element => {
-                    let orderQty = element.QuantityOrdered;
+                    const orderQty = element.QuantityOrdered;
                     for (i = 0; i < orderQty; i++) {
                         dateArr.push(new Date(moment(element.PurchaseDate).format("MM-DD-YYYY")));
                     }
                 });
-                var maxDate = new Date(Math.max.apply(null, dateArr));
-                var counts = 0;
-                console.log(maxDate.getDate());
+                const maxDate = moment(Math.max.apply(null, dateArr));
+                let counts = 0;
+
                 dateArr.forEach(date => {
-                    let diff = maxDate.getDate() - date.getDate();
-                    if (diff < days) {
+                    const diff = maxDate.diff(moment(date), 'days');
+                    console.log(diff);
+                    if (diff <= days) {
                         counts++
                     }
                 });
@@ -68,10 +79,6 @@ let salesVelocity = {
                 return (counts);
             })
     },
-
-    getAllSellerSKUs: function () {
-
-    }
 }
 salesVelocity.salesByDay('Slim Jim Bacon Jerky 8-pack');
 salesVelocity.salesForLastXDays('Slim Jim Bacon Jerky 8-pack', 7);

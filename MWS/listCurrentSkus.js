@@ -1,16 +1,16 @@
-let dotenv = require("dotenv").config({ path: __dirname + '/../.env' });
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
-let amazonMws = require('amazon-mws')(accessKey, accessSecret);
-let SellerId = process.env.MWS_SELLER_ID;
-let mySQLPassword = process.env.MYSQL_PASSWORD;
-let MWSAuthToken = process.env.MWS_AUTH_TOKEN;
-let inquirer = require("inquirer");
-let mysql = require("mysql");
-let moment = require('moment');
-let _ = require('underscore')
-let connection = require('../config/connection');
-let SKUsArray = ['1','2'];
+const dotenv = require("dotenv").config({ path: __dirname + '/../.env' });
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const amazonMws = require('amazon-mws')(accessKey, accessSecret);
+const SellerId = process.env.MWS_SELLER_ID;
+const mySQLPassword = process.env.MYSQL_PASSWORD;
+const MWSAuthToken = process.env.MWS_AUTH_TOKEN;
+const inquirer = require("inquirer");
+const mysql = require("mysql");
+const moment = require('moment');
+const _ = require('underscore')
+const connection = require('../config/connection');
+const SKUsArray = ['1','2'];
 
 
 
@@ -50,7 +50,7 @@ function inquire() {
         });
 };
 function salesByDay(msku) {
-    var query = connection.query(`SELECT
+    const query = connection.query(`SELECT
         o.AmazonOrderId,
     o.PurchaseDate,
     i.SellerSKU,
@@ -59,14 +59,14 @@ function salesByDay(msku) {
     orders o
     LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
     WHERE ?`, { SellerSKU: msku }, (err, results) => {
-            let dateArr = [];
+            const dateArr = [];
             results.forEach(element => {
-                let orderQty = element.QuantityOrdered;
+                const orderQty = element.QuantityOrdered;
                 for (i = 0; i < orderQty; i++) {
                     dateArr.push(moment(element.PurchaseDate).format("MM-DD-YYYY"));
                 }
             });
-            var counts = _.countBy(dateArr);
+            const counts = _.countBy(dateArr);
             console.log(counts);
             return (counts);
         })
@@ -76,7 +76,7 @@ function getAllSellerSKUs() {
 };
 
 
-let query = connection.query(
+const query = connection.query(
     `SELECT SellerSKU FROM order_items WHERE createdAt > '2019-01-17 05:19:29' GROUP BY SellerSKU`,
     (err, res) => {
         res.forEach(SellerSKU => {

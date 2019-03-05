@@ -1,12 +1,12 @@
 // require('newrelic');
-var express = require("express");
+const express = require("express");
 let dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 
 
 
-var PORT = process.env.PORT || 8060;
+const PORT = process.env.PORT || 8060;
 
-var app = express();
+const app = express();
 
 // Serve static content for the app from the "public" directory in the application directory.
 app.use(express.static("public"));
@@ -20,12 +20,12 @@ app.use(express.json());
 
 // I've changed this from engine to exphbs,
 // so there is no confusion with the express engine object that we use later.
-// var exphbs = require('express-handlebars');
+// const exphbs = require('express-handlebars');
 
 // Create an instance of the express-handlebars
 // If you want to pass any option offered by express-handlebar module
 // do it inside the create() in the handlebars.js file
-// var handlebars = require('./helpers/handlebars.js')(exphbs);
+// const handlebars = require('./helpers/handlebars.js')(exphbs);
 
 // The handlebars variable now has an object called engine.
 // Use that to define your app.engine

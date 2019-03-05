@@ -1,17 +1,14 @@
-let dotenv = require("dotenv").config({ path: __dirname + '/../.env' });
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
-let amazonMws = require('amazon-mws')(accessKey, accessSecret);
-let SellerId = process.env.MWS_SELLER_ID;
-let mySQLPassword = process.env.MYSQL_PASSWORD;
-let MWSAuthToken = process.env.MWS_AUTH_TOKEN;
-let inquirer = require("inquirer");
-let mysql = require("mysql");
-let moment = require('moment');
-let _ = require('underscore')
-let connection = require('../config/connection');
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const amazonMws = require('amazon-mws')(accessKey, accessSecret);
+const SellerId = process.env.MWS_SELLER_ID;
+const MWSAuthToken = process.env.MWS_AUTH_TOKEN;
+const inquirer = require("inquirer");
+const moment = require('moment');
+const _ = require('underscore')
+const connection = require('../config/connection');
 let SKUsArray=[1];
-let inventory = inventoryBuild();
+const inventory = inventoryBuild();
 
 function inventoryBuild() {
 
@@ -34,7 +31,7 @@ function inventoryBuild() {
 
     };
     function insertItem(item) {
-        let query = connection.query(
+        const query = connection.query(
             "INSERT INTO inventory_supply SET ?",
             {
                 Condition: item.Condition,
@@ -80,7 +77,7 @@ function inventoryBuild() {
                     return;
                 }
                 console.log("inventory: " + 'response recieved');
-                let inventory = response.InventorySupplyList.member; // TODO: This is an array of my Amazon FBA Inventory supply.  Insert this into mySQL database 
+                const inventory = response.InventorySupplyList.member; // TODO: This is an array of my Amazon FBA Inventory supply.  Insert this into mySQL database 
                 insertInventory(inventory);
                 if (response.NextToken) { console.log("inventory: " + 'Next Token: ' + response.NextToken); }
                 if (response.NextToken) {
@@ -96,7 +93,7 @@ function inventoryBuild() {
     };
     function removeDuplicates() {
 
-        let query = connection.query(`
+        const query = connection.query(`
         DELETE t1 FROM inventory_supply
         t1
                 INNER JOIN
@@ -150,7 +147,7 @@ function inventoryBuild() {
         }
     };
     function salesByDay(msku) {
-        var query = connection.query(`SELECT
+        const query = connection.query(`SELECT
         o.AmazonOrderId,
     o.PurchaseDate,
     i.SellerSKU,
@@ -159,14 +156,14 @@ function inventoryBuild() {
     orders o
     LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
     WHERE ?`, { SellerSKU: msku }, (err, results) => {
-                let dateArr = [];
+                const dateArr = [];
                 results.forEach(element => {
-                    let orderQty = element.QuantityOrdered;
+                    const orderQty = element.QuantityOrdered;
                     for (i = 0; i < orderQty; i++) {
                         dateArr.push(moment(element.PurchaseDate).format("MM-DD-YYYY"));
                     }
                 });
-                var counts = _.countBy(dateArr);
+                const counts = _.countBy(dateArr);
                 console.log("inventory: " + counts);
                 return (counts);
             })
@@ -178,8 +175,8 @@ function inventoryBuild() {
 
 
 SKUsArray = [];
-let query = connection.query(
-    `SELECT SellerSKU FROM inventory_supply GROUP BY SellerSKU`,
+const queryString =`SELECT SellerSKU FROM inventory_supply GROUP BY SellerSKU`;
+ connection.query(queryString,
     (err, res) => {
         res.forEach(SellerSKU => {
             SKUsArray.push(SellerSKU.SellerSKU);

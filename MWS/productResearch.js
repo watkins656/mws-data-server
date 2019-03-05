@@ -1,6 +1,6 @@
 let dotenv = require("dotenv").config();
-var accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-var accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
+const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
+const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
 let amazonMws = require('amazon-mws')(accessKey, accessSecret);
 let MWSAuthToken = process.env.MWS_AUTH_TOKEN;
 let SellerId = process.env.MWS_SELLER_ID;

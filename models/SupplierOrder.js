@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-  var SupplierOrder = sequelize.define("SupplierOrder", {
+  const SupplierOrder = sequelize.define("SupplierOrder", {
     OrderID: DataTypes.STRING,
     FBAShipmentID: DataTypes.STRING,
     SupplierOrderDate: DataTypes.DATEONLY,

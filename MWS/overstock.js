@@ -86,14 +86,14 @@ let query = connection.query(
     SUM(Quantity)/datediff(MIN(ExpirationDate),(curdate()+interval 105 day)) as SalesNeededPerDay
     FROM g19kgxd0tyqbpecb.overstock_inventory GROUP BY Name ORDER BY SalesNeededPerDay Desc`,
     (err, res) => {
-        console.log("Overstock");
-        console.log( res);
+        console.log("Overstock Results Here");
+        // console.log( res);
     }
 )
 let query2 = connection.query(
     `SELECT Name, Quantity, ExpirationDate, Location FROM overstock_inventory WHERE ExpirationDate < 2020-07-05`,
     (err, res) => {
-        console.log("overstock: " + res);
+        console.log("overstock by date: ");
     }
 )
 // inventory.main()

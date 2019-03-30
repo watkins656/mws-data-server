@@ -7,7 +7,7 @@ const inquirer = require("inquirer");
 const moment = require('moment');
 const _ = require('underscore')
 const connection = require('../config/connection');
-let SKUsArray=[1];
+let SKUsArray = [1];
 const inventory = inventoryBuild();
 
 function inventoryBuild() {
@@ -18,7 +18,6 @@ function inventoryBuild() {
         insertInventory,
         insertItem,
         fulfillmentInventoryRequest,
-        inquire,
         salesByDay,
         getAllSellerSKUs
     })
@@ -50,7 +49,7 @@ function inventoryBuild() {
         )
     };
     function fulfillmentInventoryRequest(nextToken) {
-        nextToken?console.log("inventory: " + 'running with nextToken: ' + nextToken):console.log("inventory: " + 'Initial Request');
+        nextToken ? console.log("inventory: " + 'running with nextToken: ' + nextToken) : console.log("inventory: " + 'Initial Request');
         amazonMws.fulfillmentInventory.search((nextToken) ? {
             'Version': '2010-10-01',
             'Action': 'ListInventorySupplyByNextToken',
@@ -106,46 +105,6 @@ function inventoryBuild() {
                 console.log("inventory: " + 'finished removing duplicates'); return;
             });
     };
-    function inquire() {
-        setTimeout(
-            inquireA, 5000
-        )
-        function inquireA() {
-            inquirer
-                .prompt([
-                    // Here we create a basic text prompt.
-                    {
-                        type: "list",
-                        message: "Which SKU would you like?",
-                        choices: this.SKUsArray||['none']
-                        ,
-                        name: "SKU"
-                    },
-                    {
-                        type: "list",
-                        message: "How would you like the results?",
-                        choices: ["BY DAY", "BY WEEK", "BY MONTH"],
-                        name: "org"
-                    },
-                ])
-                .then((res) => {
-                    switch (res.org) {
-                        case "BY DAY":
-                            this.salesByDay(res.SKU)
-                            break;
-                        case "BY WEEK":
-                            console.log("inventory: " + "By Week"); //TODO:
-                            break;
-                        case "BY MONTH":
-                            console.log("inventory: " + "By Month");    //TODO:
-                            break;
-
-                        default:
-                            break;
-                    }
-                });
-        }
-    };
     function salesByDay(msku) {
         const query = connection.query(`SELECT
         o.AmazonOrderId,
@@ -175,19 +134,15 @@ function inventoryBuild() {
 
 
 SKUsArray = [];
-const queryString =`SELECT SellerSKU FROM inventory_supply GROUP BY SellerSKU`;
- connection.query(queryString,
+const queryString = `SELECT SellerSKU FROM inventory_supply GROUP BY SellerSKU`;
+connection.query(queryString,
     (err, res) => {
         res.forEach(SellerSKU => {
             SKUsArray.push(SellerSKU.SellerSKU);
         });
         inventory.SKUsArray = SKUsArray;
-        inventory.inquire()
-
     }
 )
-// inventory.main()
-// inventory.fulfillmentInventoryRequest();
-// inventory.inquire();
+
 
 module.exports = inventory;

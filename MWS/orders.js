@@ -23,8 +23,7 @@ connection.connect(function (err) {
 
 
 //Create a new date and subtract 2 minutes to get the most recent allowable request time.
-let now = new Date();
-let requestTime = now;
+let requestTime =new Date();
 requestTime.setMinutes(now.getMinutes() - 3);
 
 
@@ -126,36 +125,6 @@ let orders = {
             }
         )
     },
-    main: function () {
-        inquirer
-            .prompt([
-                // Here we create a basic text prompt.
-                {
-                    type: "list",
-                    message: "What would you like to do?",
-                    choices: ["UPDATE DATABASE WITH LATEST ORDERS (Recommended)", "GET SALES VELOCITY FOR SKU", "CHECK PAR LEVELS FOR ASIN"],
-                    name: "action"
-                },
-            ])
-            .then((res) => {
-                switch (res.action) {
-                    case "UPDATE DATABASE WITH LATEST ORDERS (Recommended)":
-                        this.getLastRunDate();
-                        this.request();
-                        break;
-                    case "GET SALES VELOCITY FOR SKU":
-                        let salesVelocity = require('./salesVelocity.js');
-                        salesVelocity.main();
-                        break;
-                    case "CHECK PAR LEVELS FOR SKU":
-                        require('./PAR.js');
-                        break;
-
-                    default:
-                        break;
-                }
-            });
-    }
-}
-
-orders.main();
+ }
+module.exports = orders;
+// orders.main();

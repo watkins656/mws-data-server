@@ -38,7 +38,7 @@ const salesVelocity = {
                     }
                 });
                 const counts = _.countBy(dateArr);
-                console.log(counts);
+                // console.log(counts);
                 return (counts);
             })
     },
@@ -70,16 +70,15 @@ const salesVelocity = {
 
                 dateArr.forEach(date => {
                     const diff = maxDate.diff(moment(date), 'days');
-                    console.log(diff);
                     if (diff <= days) {
                         counts++
                     }
                 });
-                console.log("Sold " + counts + " items in the last " + days + " days!");
+                console.log("Sold " + counts + " units of "+msku+" in the last " + days + " days!");
                 return (counts);
             })
     },
 }
-salesVelocity.salesByDay('Slim Jim Bacon Jerky 8-pack');
-salesVelocity.salesForLastXDays('Slim Jim Bacon Jerky 8-pack', 7);
+
+module.exports = salesVelocity;
 

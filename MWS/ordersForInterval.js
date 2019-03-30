@@ -46,7 +46,6 @@ function orders() {
                     date = new Date();
                 }
                 request();
-                // Call updateProduct AFTER the INSERT completes
             }
         )
     };
@@ -108,7 +107,8 @@ function orders() {
                     if (response.length == 0) {
                         insertOrder(order);
                     }
-                    else console.log("ordersForInterval: " + "order already in database");
+                    else { //console.log("ordersForInterval: " + "order already in database");
+                    }
                 });
         });
     };

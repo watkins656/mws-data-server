@@ -1,94 +1,45 @@
 const dotenv = require("dotenv").config({ path: __dirname + '/../.env' });
-const accessKey = process.env.AWS_ACCESS_KEY_ID || 'YOUR_KEY';
-const accessSecret = process.env.AWS_SECRET_ACCESS_KEY || 'YOUR_SECRET';
-const amazonMws = require('amazon-mws')(accessKey, accessSecret);
-const SellerId = process.env.MWS_SELLER_ID;
-const mySQLPassword = process.env.MYSQL_PASSWORD;
-const MWSAuthToken = process.env.MWS_AUTH_TOKEN;
-const inquirer = require("inquirer");
-const mysql = require("mysql");
-const moment = require('moment');
-const _ = require('underscore')
 const connection = require('../config/connection');
-const SKUsArray = ['1','2'];
+const SKUsArray = [];
 
 
+const skuList = {
 
-function inquire() {
-    console.log(SKUsArray);
-    inquirer
-        .prompt([
-            // Here we create a basic text prompt.
-            {
-                type: "list",
-                message: "Which SKU would you like?",
-                choices: SKUsArray,
-                name: "SKU"
-            },
-            {
-                type: "list",
-                message: "How would you like the results?",
-                choices: ["BY DAY", "BY WEEK", "BY MONTH"],
-                name: "org"
-            },
-        ])
-        .then((res) => {
-            switch (res.org) {
-                case "BY DAY":
-                    salesByDay(res.SKU)
-                    break;
-                case "BY WEEK":
-                    console.log("By Week"); //TODO:
-                    break;
-                case "BY MONTH":
-                    console.log("By Month");    //TODO:
-                    break;
+    list: function (days) {
+        return new Promise(function (resolve, reject) {
+            let date = new Date('1994-07-05') //Day Amazon Launches
+            if (days) {
+                date = new Date();
+                date.setDate(date.getDate() - days);
+                function formatDate(date) {
+                    var day = date.getDate();
+                    var monthIndex = date.getMonth();
+                    monthIndex++;
+                    var year = date.getFullYear();
+                    if (day < 10) {
+                        day = '0' + day;
+                    }
+                    if (monthIndex < 10) {
+                        monthIndex = '0' + monthIndex;
+                    }
 
-                default:
-                    break;
-            }
-        });
-};
-function salesByDay(msku) {
-    const query = connection.query(`SELECT
-        o.AmazonOrderId,
-    o.PurchaseDate,
-    i.SellerSKU,
-    i.QuantityOrdered
-    FROM
-    orders o
-    LEFT JOIN order_items i ON o.AmazonOrderId = i.AmazonOrderId
-    WHERE ?`, { SellerSKU: msku }, (err, results) => {
-            const dateArr = [];
-            results.forEach(element => {
-                const orderQty = element.QuantityOrdered;
-                for (i = 0; i < orderQty; i++) {
-                    dateArr.push(moment(element.PurchaseDate).format("MM-DD-YYYY"));
+                    return "'" + year + '-' + (monthIndex) + '-' + day + "'";
                 }
-            });
-            const counts = _.countBy(dateArr);
-            console.log(counts);
-            return (counts);
+
+                date = (formatDate(date));
+                console.log(date);
+            }
+            let queryString = `SELECT SellerSKU FROM order_items WHERE createdAt > ${date} GROUP BY SellerSKU`;
+            console.log(queryString);
+            const query = connection.query(queryString,
+                (err, res) => {
+                    res.forEach(SellerSKU => {
+                        SKUsArray.push(SellerSKU.SellerSKU);
+                    });
+                    resolve(SKUsArray);
+                })
         })
-};
-function getAllSellerSKUs() {
+    },
+}
 
-};
-
-
-const query = connection.query(
-    `SELECT SellerSKU FROM order_items WHERE createdAt > '2019-01-17 05:19:29' GROUP BY SellerSKU`,
-    (err, res) => {
-        res.forEach(SellerSKU => {
-            SKUsArray.push(SellerSKU.SellerSKU);
-        });
-        console.log(SKUsArray);
-        // inquire()
-        salesByDay('Slim Jim Bacon Jerky 8-pack')
-
-    }
-)
-// inventory.main()
-// inventory.fulfillmentInventoryRequest();
-// inventory.inquire();
-
+module.exports = skuList;

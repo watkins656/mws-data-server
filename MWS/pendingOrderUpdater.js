@@ -18,7 +18,7 @@ function orders() {
     let updateAfter = '';
     const updateBefore = requestTime;
     getLastRunDate();
-    const action = `ListOrders`;
+    let action = `ListOrders`;
 
     return Object.freeze({
         action: action,

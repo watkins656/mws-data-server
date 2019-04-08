@@ -5,18 +5,6 @@ const connection = require('../config/connection');
 
 
 const salesVelocity = {
-    SKUsArray: [1, 2],
-    main: function () {
-        const queryString = `SELECT SellerSKU from order_items GROUP BY SellerSKU ORDER BY SellerSKU`
-        const query = connection.query(queryString, (err, results) => {
-            const arr = [];
-            results.forEach(element => {
-                if (element.SellerSKU)
-                    this.SKUsArray.push(element.SellerSKU);
-            });
-            return;
-        })
-    },
     salesByDay: function (msku) {
         const queryString = `SELECT
         o.AmazonOrderId,
@@ -38,7 +26,7 @@ const salesVelocity = {
                     }
                 });
                 const counts = _.countBy(dateArr);
-                // console.log(counts);
+                console.log(counts);
                 return (counts);
             })
     },
@@ -65,7 +53,7 @@ const salesVelocity = {
                         dateArr.push(new Date(moment(element.PurchaseDate).format("MM-DD-YYYY")));
                     }
                 });
-                const maxDate = moment(Math.max.apply(null, dateArr));
+                const maxDate = moment();
                 let counts = 0;
 
                 dateArr.forEach(date => {

@@ -51,7 +51,7 @@ app.use(routes);
 
 db.sequelize.sync().then(function() {
   app.listen(PORT, function() {
-    console.log("Server listening on: http://localhost:" + PORT);
+    // console.log("Server listening on: http://localhost:" + PORT);
   });
 });
 

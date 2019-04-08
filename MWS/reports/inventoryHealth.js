@@ -2,18 +2,33 @@ const connection = require('../../config/connection')
 
 const inventoryHealth = {
 
+    
     updateInventoryHealthTable: function (report) {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
+            function saveToDb(item) {
+                return new Promise((resolve, reject) => {
+                    const queryString = "INSERT INTO InventoryHealths SET ?";
+                    connection.query(queryString, item, (err, res) => {
+                        if (res.changedRows) { console.log(res.changedRows + " order inserted!\n"); }
+                        resolve(res)
+                    })
+                })
+            }
 
-            async function processItems(report) {
-                for (const item of report) {
-                    await inventoryHealth.insertItem(item);
-                }
-                console.log("done...");
-                resolve("Done!");
-            };
-            processItems(report);
-        });
+
+
+            var promises = []
+            report.forEach(item => {
+                promises.push(saveToDb(item));
+            });
+
+
+            Promise.all(promises)
+                .then(results => {
+                    // todo: do something with results
+                    resolve(results)
+                });
+        })
     },
     insertItem: async function (item) {
         const queryString = "INSERT INTO InventoryHealths SET ?";
@@ -60,7 +75,8 @@ const inventoryHealth = {
                     }
 
                     let where = { id: sku.id }
-                    connection.query(update,set,where, (err, res) => {
+                    let params = [set, where];
+                    connection.query(update, params, (err, res) => {
                         if (err)
                             console.log(err);
                         else

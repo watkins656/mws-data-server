@@ -32,7 +32,6 @@ function findCurrentReportByType(reportType, reports) {
     let i = 0;
     while (!found) {
         if (reports[i]["ReportType"] === reportType) {
-            console.log("FOUND");
             found = true;
             return reports[i];
         }

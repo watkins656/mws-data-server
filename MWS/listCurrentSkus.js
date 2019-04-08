@@ -30,7 +30,6 @@ const skuList = {
                 console.log(date);
             }
             let queryString = `SELECT SellerSKU FROM order_items WHERE createdAt > ${date} GROUP BY SellerSKU`;
-            console.log(queryString);
             const query = connection.query(queryString,
                 (err, res) => {
                     res.forEach(SellerSKU => {

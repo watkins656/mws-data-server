@@ -29,19 +29,15 @@ function orders() {
         request,
         insertOrders,
         insertOrder,
-        main
     })
 
-
     function getLastRunDate() {
-        console.log("ordersForInterval: " + "Checking for Orders");
         const queryString = "SELECT MAX(PurchaseDate)as date FROM orders";
         connection.query(queryString,
             function (err, res) {
                 if (res) {
                     date = new Date(res[0].date);
                     updateAfter = moment(date.setDate(date.getDate() - 1)).toISOString();
-                    console.log("ordersForInterval: " + "update after: " + updateAfter);
                 } else {
                     date = new Date();
                 }
@@ -51,7 +47,6 @@ function orders() {
     };
 
     function request(NextToken) {
-        console.log("ordersForInterval: " + "Checking for new Orders");
         amazonMws.orders.search((NextToken) ? {
             'Version': '2013-09-01',
             'Action': action,
@@ -73,7 +68,6 @@ function orders() {
                 if (error) {
                     console.log("ordersForInterval: " + 'request error Code: ', error.Code);
                     if (error.Code == 'RequestThrottled') {
-                        console.log("ordersForInterval: " + 'restarting due to request throttled');
                         setTimeout(
                             function () { request(NextToken) }, 180000);
                     }
@@ -81,16 +75,15 @@ function orders() {
                 }
                 const orders = response.Orders.Order;
                 insertOrders(orders);
-                if (response.NextToken) { console.log("ordersForInterval: " + 'Next Token: ' + response.NextToken); }
                 if (response.NextToken) {
                     NextToken = (response.NextToken);
-                    console.log("ordersForInterval: " + NextToken);
                     action = 'ListOrdersByNextToken'
                     setTimeout(
-                        function () { console.log("ordersForInterval: " + 'timeout'); request(NextToken) }, 1000);
+                        function () {
+                            request(NextToken)
+                        }, 1000);
                 }
                 else {
-                    console.log("ordersForInterval: " + "No More Orders! Checking again in 5 minutes");
                     setTimeout(
                         function () { request() }, 300000);
                 }
@@ -104,10 +97,9 @@ function orders() {
             const queryParams = { AmazonOrderId: order.AmazonOrderId };
             connection.query(queryString, queryParams,
                 (err, response) => {
+                     
                     if (response.length == 0) {
                         insertOrder(order);
-                    }
-                    else { //console.log("ordersForInterval: " + "order already in database");
                     }
                 });
         });
@@ -116,7 +108,6 @@ function orders() {
     function insertOrder(order) {
         const queryString = "INSERT INTO orders SET ?";
         const queryParams = {
-
             AmazonOrderId: order.AmazonOrderId,
             BuyerEmail: order.BuyerEmail,
             BuyerName: order.BuyerName,
@@ -144,43 +135,11 @@ function orders() {
             ShippingAddress: order.ShippingAddress
         };
         connection.query(queryString, queryParams,
-
             function (err, res) {
-                console.log("ordersForInterval: " + err);
-                console.log("ordersForInterval: " + res.affectedRows + " order inserted!\n");
-                // Call updateProduct AFTER the INSERT completes
+                if (err) {
+                    console.log("ordersForInterval: " + err);
+                }
             }
         )
     };
-    function main() {
-        inquirer
-            .prompt([
-                // Here we create a basic text prompt.
-                {
-                    type: "list",
-                    message: "What would you like to do?",
-                    choices: ["UPDATE DATABASE WITH LATEST ORDERS (Recommended)", "GET SALES VELOCITY FOR SKU", "CHECK PAR LEVELS FOR ASIN"],
-                    name: "action"
-                },
-            ])
-            .then((res) => {
-                switch (res.action) {
-                    case "UPDATE DATABASE WITH LATEST ORDERS (Recommended)":
-                        getLastRunDate();
-                        request();
-                        break;
-                    case "GET SALES VELOCITY FOR SKU":
-                        const salesVelocity = require('./salesVelocity.js');
-                        salesVelocity.main();
-                        break;
-                    case "CHECK PAR LEVELS FOR SKU":
-                        require('./PAR.js');
-                        break;
-
-                    default:
-                        break;
-                }
-            });
-    };
-
 };

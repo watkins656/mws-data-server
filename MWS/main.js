@@ -6,10 +6,8 @@ const listCurrentSkus = require("./listCurrentSkus");
 const salesVelocity = require("./salesVelocity");
 
 const MWSTest = function () {
-    // const orders = require("./ordersForInterval");
-    // const reports = require("./reports");
-    salesVelocity.salesByDay("ED-45LG-0O6V")
 
+    const finances = require('./finances')
 }
 const MWS = function () {
 
@@ -46,5 +44,5 @@ const MWS = function () {
 }
 
 
-MWS();
-// MWSTest();
+// MWS();
+MWSTest();
